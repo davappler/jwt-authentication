@@ -104,4 +104,28 @@ async function updateHandler(req, res) {
   }
 }
 
-module.exports = { registerHandler, loginHandler, updateHandler };
+/**
+ * Adds two numbers together.
+ * @param {object} req The request object
+ * @param {object} res The response object
+ */
+async function deleteHandler(req, res) {
+  const { id } = req.body;
+  await User.findById(id)
+    .then((user) => user.deleteOne())
+    .then((user) =>
+      res.status(201).json({ message: "User successfully deleted", user })
+    )
+    .catch((error) =>
+      res
+        .status(400)
+        .json({ message: "An error occurred", error: error.message })
+    );
+}
+
+module.exports = {
+  registerHandler,
+  loginHandler,
+  updateHandler,
+  deleteHandler,
+};
