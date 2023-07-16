@@ -17,7 +17,7 @@ async function registerHandler(req, res) {
 
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
-    const user = await createUser(username, hashedPassword);
+    const user = await createUser(username, hashedPassword, "admin");
     const maxAge = 3 * 60 * 60;
     const token = generateJwtToken(user, maxAge);
 
