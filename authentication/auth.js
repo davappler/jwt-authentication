@@ -1,53 +1,14 @@
 const User = require("../model/user");
-const bcrypt = require("bcryptjs");
 require("dotenv").config();
 
-const { registerHandler } = require("./handlers");
-const { generateJwtToken } = require("./helpers");
+const { registerHandler, loginHandler } = require("./handlers");
 
 exports.register = async (req, res, next) => {
   registerHandler(req, res);
 };
 
 exports.login = async (req, res, next) => {
-  const { username, password } = req.body;
-  // Check if username and password is provided
-  if (!username || !password) {
-    return res.status(400).json({
-      message: "Username or Password not present",
-    });
-  }
-
-  try {
-    const user = await User.findOne({ username });
-    if (!user) {
-      res.status(401).json({
-        message: "Login not successful",
-        error: "User not found",
-      });
-    } else {
-      const isPasswordCorrect = await bcrypt.compare(password, user.password);
-      if (isPasswordCorrect) {
-        const maxAge = 3 * 60 * 60;
-        const token = generateJwtToken(user, maxAge);
-        res.cookie("jwt", token, {
-          httpOnly: true,
-          maxAge: maxAge * 1000,
-        });
-        res.status(201).json({
-          message: "User successfully Logged in",
-          user: user._id,
-        });
-      } else {
-        res.status(400).json({ message: "Login not succesful" });
-      }
-    }
-  } catch (error) {
-    res.status(400).json({
-      message: "An error occurred",
-      error: error.message,
-    });
-  }
+  loginHandler(req, res);
 };
 
 exports.update = async (req, res, next) => {
