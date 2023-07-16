@@ -8,9 +8,8 @@ const { createUser, generateJwtToken } = require("./helpers");
  * Adds two numbers together.
  * @param {object} req The request object
  * @param {object} res The response object
- * @param {object} next The next function in the middleware chain
  */
-async function registerHandler(req, res, next) {
+async function registerHandler(req, res) {
   const { username, password } = req.body;
   if (password.length < 6) {
     return res.status(400).json({ message: "Password less than 6 characters" });
@@ -43,9 +42,8 @@ async function registerHandler(req, res, next) {
  * Adds two numbers together.
  * @param {object} req The request object
  * @param {object} res The response object
- * @param {object} next The next function in the middleware chain
  */
-async function loginHandler(req, res, next) {
+async function loginHandler(req, res) {
   const { username, password } = req.body;
   if (!username || !password) {
     return res.status(400).json({
@@ -85,4 +83,25 @@ async function loginHandler(req, res, next) {
   }
 }
 
-module.exports = { registerHandler, loginHandler };
+/**
+ * Adds two numbers together.
+ * @param {object} req The request object
+ * @param {object} res The response object
+ */
+async function updateHandler(req, res) {
+  const { newUserName, id } = req.body;
+  // Verifying if role and id is present
+
+  try {
+    const user = await User.findById(id);
+    user.username = newUserName;
+    user.save();
+    res.status(200).json({ message: "Username updated succesfully" });
+  } catch (error) {
+    res
+      .status(400)
+      .json({ message: "An error occurred", error: error.message });
+  }
+}
+
+module.exports = { registerHandler, loginHandler, updateHandler };
