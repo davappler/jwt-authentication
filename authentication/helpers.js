@@ -20,7 +20,7 @@ async function createUser(username, hashedPassword, role = "Basic") {
 }
 
 /**
- * Adds two numbers together.
+ * Generates a JWT token
  * @param {object} user The user
  * @param {int} maxAge The maxAge of token, by default it is 3 hours
  * @param {string} jwtSecret The jwtToken secret, default value is ENV variable
