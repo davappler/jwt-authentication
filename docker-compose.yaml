@@ -1,0 +1,28 @@
+version: "3"
+services:
+  node-app:
+    build: .
+    image: davappler/node-app
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/role_auth
+    networks:
+      - my_network
+    # MongoDB service
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - my_network
+
+networks:
+  my_network:
+
+volumes:
+  mongo_data:
