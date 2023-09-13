@@ -1,9 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {useState} from "react";
+import { useState } from "react";
 
 function Dashboard() {
-  const [tempMessage, setTempMessage] = useState<string>("")
+  const [tempMessage, setTempMessage] = useState<string>("");
   function sendToken() {
     const jwtToken = localStorage.getItem("jwt");
     console.log("AGyaaaaaa", jwtToken);
@@ -24,7 +24,7 @@ function Dashboard() {
       .then((response) => response.json())
       .then((JsonResponse) => {
         console.log("I got jsonResponse from backend", JsonResponse);
-        setTempMessage(JsonResponse.message)
+        setTempMessage(JsonResponse.message);
       });
   }
   return (

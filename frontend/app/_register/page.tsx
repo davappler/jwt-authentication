@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Info from "../_components/info";
 // import bcrypt from "bcryptjs";
 
 function Register() {
@@ -10,7 +11,7 @@ function Register() {
   const router = useRouter();
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+  async function handleRegister(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const formDataAsEntries = formData.entries();
@@ -50,9 +51,37 @@ function Register() {
     }
   }
   return (
-    <>
+    <div className="mt-20 grid grid-cols-2 justify-items-center">
+      <div className="pt-10 bg-gray-900 w-full rounded-lg flex flex-col justify-center items-center">
+        <Info />
+      </div>
+      <RegisterForm
+        handleRegister={handleRegister}
+        isError={isError}
+        errorMessage={errorMessage}
+      />
+    </div>
+  );
+}
+
+type RegisterFormType = {
+  handleRegister: (e: React.FormEvent<HTMLFormElement>) => void;
+  isError: boolean;
+  errorMessage: string | null;
+};
+
+function RegisterForm({
+  handleRegister,
+  isError,
+  errorMessage,
+}: RegisterFormType) {
+  return (
+    <div className="flex flex-col justify-center items-center">
+      <div className="py-20">
+        <h1 className="text-3xl">Welcome to JWT authentication system</h1>
+      </div>
       <form
-        onSubmit={(e) => handleLogin(e)}
+        onSubmit={(e) => handleRegister(e)}
         className="flex flex-col justify-center items-center w-1/2"
       >
         <h1 className="text-xl font-medium">Register User</h1>
@@ -72,9 +101,12 @@ function Register() {
         <Button type="submit" className="mt-2">
           Register
         </Button>
+        <a href="/login" className="text-sm text-cyan-600 mt-1">
+          Already registered? Login here
+        </a>
         {isError && <div className="text-red-400"> {errorMessage}</div>}
       </form>
-    </>
+    </div>
   );
 }
 
