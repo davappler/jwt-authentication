@@ -16,9 +16,6 @@ function Login() {
     const formDataAsEntries = formData.entries();
     const formDataAsObject = Object.fromEntries(formDataAsEntries);
     const password = formDataAsObject.password;
-    if (password.length < 6) {
-      setErrorMessage("Password should be minimum 6 characters ling");
-    } else {
       // I should encrypt password before sending in body ?
       // const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -38,16 +35,15 @@ function Login() {
         .then((response) => response.json())
         .then((jsonResponse) => {
           if (!jsonResponse.error) {
-            // router.push("/dashboard");
-            console.log("Balle balle", jsonResponse.token);
             localStorage.setItem("jwt", jsonResponse.token);
+            router.push("/dashboard");
           } else {
             setIsError(true);
             setErrorMessage(jsonResponse.message);
           }
         })
         .catch((error) => console.log(error));
-    }
+    
   }
   return (
     <div className="min-h-screen flex justify-center items-center">

@@ -26,15 +26,20 @@ app.post("/testing-jwt", (req, res) => {
   const { jwtToken } = req.body;
   // I should be taking jwtToken from user's header
 
-  jwt.verify(jwtToken, process.env.JWT_SECRET, function (err, decoded) {
+  jwt.verify(jwtToken, process.env.JWT_SECRET, function(err, decoded) {
     if (err) {
-      console.log("There was an erorrrr", err);
-      res
+      console.log("Token is not valid");
+      return res
         .status(400)
         .json({ message: "Error verifying the token", error: true });
     }
-    console.log("Decoded", decoded);
-    res.status(200).json({ message: "token decoded, all good" });
+    const { exp } = decoded;
+    if (Date.now() >= exp * 1000) {
+      console.log("token is expired");
+      return res.status(400).json({ message: "token is expired" });
+    } else {
+      return res.status(200).json({ message: "token is valid" });
+    }
   });
 });
 

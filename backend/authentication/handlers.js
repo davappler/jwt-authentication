@@ -30,7 +30,7 @@ async function registerHandler(req, res) {
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
     const user = await createUser(username, hashedPassword, "basic");
-    const maxAge = 3 * 60 * 60;
+    const maxAge = 3 * 60 * 60; // This is in seconds => 3*60*60 is 3 hours
     const token = generateJwtToken(user, maxAge);
 
     // res.cookie("jwtToken", token, {
@@ -41,7 +41,7 @@ async function registerHandler(req, res) {
     // res.cookie("cookieName", "cookieValue");
 
     return res.status(201).json({
-      message: "User successfully created okokokokokok",
+      message: "User successfully created",
       user,
       token,
     });
