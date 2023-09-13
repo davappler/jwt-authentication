@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 // const { adminAuth } = require("./middleware/admin/auth");
 // const { userAuth } = require("./middleware/user/auth");
+// const authenticateToken = require("./middleware/authenticateToken");
 
 // Connecting the Database
 connectDB();
@@ -22,25 +23,43 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", require("./authentication/routes"));
 
-app.post("/testing-jwt", (req, res) => {
-  const { jwtToken } = req.body;
-  // I should be taking jwtToken from user's header
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
 
-  jwt.verify(jwtToken, process.env.JWT_SECRET, function(err, decoded) {
+  if (!token) {
+    return res.sendStatus(401);
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       console.log("Token is not valid");
       return res
-        .status(400)
+        .status(403)
         .json({ message: "Error verifying the token", error: true });
     }
+
     const { exp } = decoded;
     if (Date.now() >= exp * 1000) {
       console.log("token is expired");
-      return res.status(400).json({ message: "token is expired" });
+      return res.status(403).json({ message: "token is expired" });
     } else {
-      return res.status(200).json({ message: "token is valid" });
+      // Add the decoded information to the request object
+      req.user = decoded;
+      next();
     }
   });
+};
+
+app.get("/books", authenticateToken, (req, res) => {
+  res.json({
+    books: ["Book one", "Book two", "Book one", "Book three", "Book four"],
+  });
+});
+
+app.get("/get-user-email", authenticateToken, (req, res) => {
+  const username = req.user.username;
+  return res.status(200).json({ username });
 });
 
 const server = app.listen(PORT, () =>

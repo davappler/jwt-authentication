@@ -1,36 +1,55 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function Dashboard() {
-  const [tempMessage, setTempMessage] = useState<string>("");
-  function sendToken() {
+  const [userName, setUserName] = useState<string>("")
+  const [books, setBooks] = useState<Array<string>>()
+  const [isBooksError, setIsBooksError]= useState<boolean>()
+
+  // We are fetching username from backend with the help of the JWT token that is in localStorage.
+  useEffect(() => {
     const jwtToken = localStorage.getItem("jwt");
-    console.log("AGyaaaaaa", jwtToken);
-
-    const body = {
-      jwtToken,
-    };
-
-    fetch("http://localhost:5001/testing-jwt", {
-      method: "POST",
+    fetch("http://localhost:5001/get-user-email", {
+      method: "GET",
       mode: "cors",
       headers: {
         Authorization: `Bearer ${jwtToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(body),
     })
       .then((response) => response.json())
       .then((JsonResponse) => {
         console.log("I got jsonResponse from backend", JsonResponse);
-        setTempMessage(JsonResponse.message);
+        setUserName(JsonResponse.username);
+      });
+  }, []);
+
+  function getBooksList() {
+    const jwtToken = localStorage.getItem("jwt");
+    fetch("http://localhost:5001/books", {
+      method: "GET",
+      mode: "cors",
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((jsonResponse) => {
+        setBooks(jsonResponse.books);
       });
   }
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center">
-      <Button onClick={sendToken}>Send Token Check</Button>
-      <div>{tempMessage}</div>
+    <div className="mt-20 flex flex-col justify-center items-center">
+      <h2 className="mt-20 text-xl">Welcome <span className="text-indigo-600">{userName}</span></h2>
+      <h3 className="p-10">
+        This button will send a request to backend with a JWT token, if JWT token is
+        valid it will fetch a list of books, otherwise it will display access denied.
+      </h3>
+      <Button onClick={getBooksList}>Get a list of Books to read</Button>
+      <ul className="mt-4">{books?.map((book,index)=> <li key={index}>{book}</li>)}</ul>
+      <div>{isBooksError && <span className="text-red-500">Access denied!!</span>}</div>
     </div>
   );
 }
