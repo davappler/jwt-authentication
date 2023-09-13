@@ -11,23 +11,37 @@ const { createUser, generateJwtToken } = require("./helpers");
  */
 async function registerHandler(req, res) {
   const { username, password } = req.body;
+
+  const user = await User.findOne({ username });
+  if (user) {
+    return res.status(409).json({
+      message: "User already registered, please login.",
+      error: true,
+    });
+  }
+
   if (password.length < 6) {
-    return res.status(400).json({ message: "Password less than 6 characters" });
+    return res.status(400).json({
+      message: "Password must be longer than 6 characters",
+      error: true,
+    });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
-    const user = await createUser(username, hashedPassword, "admin");
+    const user = await createUser(username, hashedPassword, "basic");
     const maxAge = 3 * 60 * 60;
     const token = generateJwtToken(user, maxAge);
 
-    res.cookie("jwt", token, {
+    res.cookie("jwtToken", token, {
       httpOnly: true,
       maxAge: maxAge * 1000,
     });
 
-    res.status(201).json({
-      message: "User successfully created",
+    // res.cookie("cookieName", "cookieValue");
+
+    return res.status(201).json({
+      message: "User successfully created okokokokokok",
       user,
     });
   } catch (error) {

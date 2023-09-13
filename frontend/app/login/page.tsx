@@ -1,8 +1,12 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
 function Login() {
+  // const router = useRouter();
+  const [isError, setIsError] = useState(false);
   function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     console.log(e);
     e.preventDefault();
@@ -11,6 +15,27 @@ function Login() {
     const formDataAsObject = Object.fromEntries(formDataAsEntries);
 
     console.log("HAHAH", formDataAsObject);
+
+    const body = {
+      username: formDataAsObject.username,
+      password: formDataAsObject.password,
+    };
+
+    fetch("http://localhost:5001/api/auth/login", {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    })
+      .then((response) => response.json())
+      .then((jsonResponse) => {
+        if (!jsonResponse.error) {
+          // router.push("/dashboard");
+        } else {
+          setIsError(true);
+        }
+      })
+      .catch((error) => console.log(error));
   }
   return (
     <>

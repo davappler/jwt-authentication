@@ -1,6 +1,7 @@
 const express = require("express");
 const connectDB = require("./db");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 // const { adminAuth } = require("./middleware/admin/auth");
 // const { userAuth } = require("./middleware/user/auth");
 
@@ -10,7 +11,14 @@ connectDB();
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+// credentials: true is added for cookies to be set in the user's browser
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 const PORT = 5001;
+
+
+app.get("/", (req, res) => {
+  res.send({ message: "Hello World! hahahha" });
+});
 
 app.use("/api/auth", require("./authentication/routes"));
 
