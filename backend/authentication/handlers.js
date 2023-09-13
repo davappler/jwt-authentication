@@ -33,16 +33,17 @@ async function registerHandler(req, res) {
     const maxAge = 3 * 60 * 60;
     const token = generateJwtToken(user, maxAge);
 
-    res.cookie("jwtToken", token, {
-      httpOnly: true,
-      maxAge: maxAge * 1000,
-    });
+    // res.cookie("jwtToken", token, {
+    //   httpOnly: true,
+    //   maxAge: maxAge * 1000,
+    // });
 
     // res.cookie("cookieName", "cookieValue");
 
     return res.status(201).json({
       message: "User successfully created okokokokokok",
       user,
+      token,
     });
   } catch (error) {
     res.status(401).json({
@@ -61,7 +62,8 @@ async function loginHandler(req, res) {
   const { username, password } = req.body;
   if (!username || !password) {
     return res.status(400).json({
-      message: "Username or Password not present",
+      message: "Username or Password not invalid",
+      error: true,
     });
   }
 
@@ -69,30 +71,35 @@ async function loginHandler(req, res) {
     const user = await User.findOne({ username });
     if (!user) {
       res.status(401).json({
-        message: "Login not successful",
-        error: "User not found",
+        message: "User not found. Please register.",
+        error: true,
       });
     } else {
       const isPasswordCorrect = await bcrypt.compare(password, user.password);
       if (isPasswordCorrect) {
         const maxAge = 3 * 60 * 60;
         const token = generateJwtToken(user, maxAge);
-        res.cookie("jwt", token, {
-          httpOnly: true,
-          maxAge: maxAge * 1000,
-        });
+        // res.cookie("jwt", token, {
+        //   httpOnly: true,
+        //   maxAge: maxAge * 1000,
+        // });
         res.status(201).json({
           message: "User successfully Logged in",
           user: user._id,
+          token,
         });
       } else {
-        res.status(400).json({ message: "Login not succesful" });
+        res.status(400).json({
+          message:
+            "Login not successful, please check your username or password",
+          error: true,
+        });
       }
     }
   } catch (error) {
     res.status(400).json({
       message: "An error occurred",
-      error: error.message,
+      error: true,
     });
   }
 }

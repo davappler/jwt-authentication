@@ -1,4 +1,5 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const connectDB = require("./db");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -15,15 +16,27 @@ app.use(cookieParser());
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 const PORT = 5001;
 
-
 app.get("/", (req, res) => {
   res.send({ message: "Hello World! hahahha" });
 });
 
 app.use("/api/auth", require("./authentication/routes"));
 
-// app.get("/admin", adminAuth, (req, res) => res.send("Admin Route"));
-// app.get("/basic", userAuth, (req, res) => res.send("User Route"));
+app.post("/testing-jwt", (req, res) => {
+  const { jwtToken } = req.body;
+  // I should be taking jwtToken from user's header
+
+  jwt.verify(jwtToken, process.env.JWT_SECRET, function (err, decoded) {
+    if (err) {
+      console.log("There was an erorrrr", err);
+      res
+        .status(400)
+        .json({ message: "Error verifying the token", error: true });
+    }
+    console.log("Decoded", decoded);
+    res.status(200).json({ message: "token decoded, all good" });
+  });
+});
 
 const server = app.listen(PORT, () =>
   console.log(`Server Connected to port ${PORT}`)
@@ -33,3 +46,6 @@ process.on("unhandledRejection", (err) => {
   console.log(`An error occurred: ${err.message}`);
   server.close(() => process.exit(1));
 });
+
+// app.get("/admin", adminAuth, (req, res) => res.send("Admin Route"));
+// app.get("/basic", userAuth, (req, res) => res.send("User Route"));

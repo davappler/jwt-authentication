@@ -32,12 +32,14 @@ function Register() {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify(body),
       })
         .then((response) => response.json())
         .then((jsonResponse) => {
           if (!jsonResponse.error) {
+            // for now we are also setting the cookie and local storage, choose one
+            localStorage.setItem("jwt", jsonResponse.token);
             router.push("/dashboard");
           } else {
             setIsError(true);
